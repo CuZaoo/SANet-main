@@ -1,0 +1,2 @@
+#nohup python -m torch.distributed.launch --nproc_per_node=1 --master_port 29503 tools/train.py  --cfg experiments/cityscapes/adcnet.yaml > train2.log 2>&1
+nohup python tools/train.py --cfg configs/cityscapes/sanet_cityscapes_S.yaml > train.log 2>&1&
