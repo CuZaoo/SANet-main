@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -112,7 +114,6 @@ class DilatedSpatialPath(nn.Module):
             x = self.hconv(x)
         out = self.conv(x)
         return out
-
 
 class TAPPM(nn.Module):
     def __init__(self, inplanes, branch_planes, outplanes):
@@ -297,7 +298,6 @@ class DualResNet(nn.Module):
                  deploy=False):
         super(DualResNet, self).__init__()
 
-        highres_planes = planes * 2
         self.augment = augment
         self.relu = nn.ReLU(inplace=False)
         # Encoder
@@ -317,9 +317,8 @@ class DualResNet(nn.Module):
         self.layer5 = self._make_layer(block, planes * 4, planes * 8, layers[3], stride=2)
         self.layer6 = self._make_layer(Bottleneck, planes * 8, planes * 8, 1, stride=2)
         self.spp = TAPPM(planes * 16, spp_planes, planes * 4)
-        # Spatial Path
-        self.dp1 = DilatedSpatialPath(planes * 2, planes * 4, D_list=[1, 2, 5, 7, 13])
-        self.dp2 = DilatedSpatialPath(planes * 4, planes * 4, D_list=[1, 2, 5, 7, 13])
+        self.dp1 = DilatedSpatialPath(planes * 2, planes * 4, D_list=[1, 2, 5])
+        self.dp2 = DilatedSpatialPath(planes * 4, planes * 4, D_list=[7, 13])
         # Decoder
         self.decoder = Decoder(planes * 4, planes * 2, mode='add')
         self.final_layer = segmenthead(planes * 2, head_planes, num_classes)
@@ -348,13 +347,15 @@ class DualResNet(nn.Module):
 
         # ImageNet
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(128, 1000)
         self.classifier = nn.Sequential(
-            nn.Linear(planes * 2, 128, bias=False),
+            nn.Linear(64, 128, bias=False),
             nn.BatchNorm1d(128),
             nn.ReLU(inplace=True),
             nn.Dropout(0.2),
             nn.Linear(128, 1000),
         )
+
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
@@ -388,12 +389,14 @@ class DualResNet(nn.Module):
         x = self.layer6(self.relu(x))
         x = self.spp(self.relu(x))
         x = self.decoder(dp1, dp2, dp, x)
+
         # ImageNet
         # x = self.avgpool(x)
         # x = x.view(x.size(0), -1)
         # x = self.classifier(x)
         # return x
 
+        # Cityscapes
         x = self.final_layer(x)
         if self.augment:
             x_s1 = self.seghead_extra(x4)
@@ -401,7 +404,6 @@ class DualResNet(nn.Module):
             return [x_s1, x, x_d1]
         else:
             return x
-
 
     def _make_layer(self, block, inplanes, planes, blocks, stride=1):
         downsample = None
@@ -425,33 +427,45 @@ class DualResNet(nn.Module):
 
 
 def DualResNet_imagenet(cfg, pretrained=False):
-    model = DualResNet(BasicBlock, [3, 3, 27, 3], num_classes=19, planes=32, spp_planes=128, head_planes=64,
+    model = DualResNet(BasicBlock, [2, 2, 2, 2], num_classes=19, planes=32, spp_planes=128, head_planes=64,
                        augment=True, deploy=False)
 
     if pretrained:
         print("Using pretrained")
-        pretrained_state = torch.load(cfg.MODEL.PRETRAINED, map_location='cpu')["state_dict"]
+        pretrained_state = torch.load(cfg.MODEL.PRETRAINED, map_location='cpu')
+        if "state_dict" in pretrained_state:
+            pretrained_state = pretrained_state["state_dict"]
         model_dict = model.state_dict()
-        pretrained_state = {k: v for k, v in pretrained_state.items() if
-                            (k in model_dict and v.shape == model_dict[k].shape)}
+        # cityscapes
+        if 'cityscapes' in cfg.MODEL.PRETRAINED:
+            pretrained_state = {k[6:]: v for k, v in pretrained_state.items() if (k[6:] in model_dict and v.shape == model_dict[k[6:]].shape)}
+        # imagenet
+        else:
+            pretrained_state = {k: v for k, v in pretrained_state.items() if (k in model_dict and v.shape == model_dict[k].shape)}
+        msg = 'Loaded {} parameters!'.format(len(pretrained_state))
+        logging.info('Attention!!!')
+        logging.info(msg)
+        logging.info('Over!!!')
         model_dict.update(pretrained_state)
         model.load_state_dict(model_dict, strict=False)
     return model
 
 
 def get_imagenet_model():
-    model = DualResNet(BasicBlock, [3, 3, 27, 3], num_classes=1000, planes=32, spp_planes=128, head_planes=64,
+    print("SANet")
+    model = DualResNet(BasicBlock, [2, 2, 2, 2], num_classes=1000, planes=32, spp_planes=128, head_planes=64,
                        augment=False)
     return model
 
 
 def get_seg_model(cfg, imgnet_pretrained, **kwargs):
+    print("SANet")
     model = DualResNet_imagenet(cfg, pretrained=imgnet_pretrained)
     return model
 
 
 def get_pred_model():
-    model = DualResNet(BasicBlock, [3, 3, 27, 3], num_classes=19, planes=32, spp_planes=128, head_planes=64,
+    model = DualResNet(BasicBlock, [2, 2, 2, 2], num_classes=19, planes=32, spp_planes=128, head_planes=64,
                        augment=False, deploy=True)
 
     return model

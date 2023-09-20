@@ -10,7 +10,7 @@ PRINT_FREQ: 10
 
 DATASET:
   DATASET: cityscapes
-  ROOT: data/
+  ROOT: ../PIDNet/data/
   TEST_SET: 'list/cityscapes/val.lst'
   TRAIN_SET: 'list/cityscapes/train.lst'
   NUM_CLASSES: 19
@@ -53,5 +53,5 @@ TEST:
   FLIP_TEST: false
   MULTI_SCALE: false
   SCALE_LIST: [ 0.5,0.75,1.0,1.25 ]
-  MODEL_FILE: 'pretrained_models/cityscapes/SANet_L.pt'
+  MODEL_FILE: 'pretrained_models/cityscapes/sanet_L.pt'
   OUTPUT_INDEX: 1

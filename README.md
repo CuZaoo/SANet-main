@@ -46,7 +46,7 @@ at a more detailed resolution.
 
 Of course, from the list above, we also performed the operation of using asymmetric convolution to replace normal
 convolution as mentioned in DMRNet, and the operation of feature multiplexing as mentioned in DDRNet. But in the end,
-from the consideration of speed and accuracy, we finally proposed APPPM
+from the consideration of speed and accuracy, we finally proposed APPPM.(In the beginning, the model was referred to as TAPPM and in SANet's modeling code as TAPPM)
 
 ### SAD
 
