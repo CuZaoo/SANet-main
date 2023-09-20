@@ -1,85 +1,99 @@
-# 用于实时语义分割的空间辅助编码器-解码器网络
-这里是SANet的官方代码仓库  
-我们在arxiv的链接是：[SANet](https://arxiv.org/abs/2309.10519)
-## SANet网络
+# Spatial-Assistant Encoder-Decoder Network forReal Time Semantic Segmentation
+
+## The official implementation of "Spatial-Assistant Encoder-Decoder Network forReal Time Semantic Segmentation"
+
+Link at arxiv：[SANet](https://arxiv.org/abs/2309.10519)
+
+English | [中文](README_zh.md)
+
+## SANet
 
 <p align="center">
-  <img src="figs/sanet.png" alt="SANet和其它模型的比较" width="500"/></br>
-  <span align="center">在城市景观测试集上比较实时模型的推理速度和准确性</span> 
+  <img src="figs/sanet.png" alt="Comparison of SANet and other models" width="500"/></br>
+  <span align="center">Comparing Inference Speed and Accuracy of Real-Time Models on the Cityscapes Dataset</span> 
 </p>
 
-### 网络结构
-![SANet网络结构图](figs/net_s.png)
+### SANet network structure
 
-SANet总体的结构图
-
-
+![SANet Network Structure](figs/net_s.png)
 
 ### APPPM
-APPPM的提出并不是一蹴而就的。APPPM的原型是DAPPM，我们的最初想法是尝试减少DAPPM的分支,这确实有利于加快速度，同时我们观察了精度的变化（我们认为几乎没有降低），但是最终还是放弃了这个想法。
 
-之后，我们参考了SPPF的思路，这是一种将“使用两个3x3卷积替换一个5x5卷积”的思路应用到池化层的思路，并进而尝试了将非对称卷积的思路应用到池化层上。在结果上，SPPF的思路似乎不利于精度的提升（当然我们没有进行彻底的研究，所以不可以完全确定），而非对称池化层的方式APPPM却是一种
-可行的方法。
+APPPM did not come about overnight, the prototype of APPPM is DAPPM, our first idea was to try to reduce the branches of
+DAPPM, which is really good for speed, and at the same time we observed the change of accuracy (we think there is almost
+no degradation), but eventually we gave up this idea.
 
-
-
+After that, we referred to the idea of SPPF, which is a kind of "use two 3x3 convolutions to replace one 5x5
+convolution" idea applied to the pooling layer, and then tried to apply the idea of asymmetric convolution to the
+pooling layer. In the results, the SPPF idea seems to be detrimental to the accuracy (of course, we did not do a
+thorough study, so we cannot be completely sure), while the asymmetric pooling layer approach APPPM is a
+feasible approach.
 
 | DAPPM                    | DAPPM减少分支                  | SPPF TAB                 | SPPF TAB ADD                 |
 |--------------------------|----------------------------|--------------------------|------------------------------|
 | ![dappm](figs/dappm.png) | ![dappm2](figs/aappm2.png) | ![sppf](figs/APPPM3.png) | ![sppf_add](figs/TAPPM3.png) |
 
-
-
 <div align=center>
     <img src=figs/APPPM.png width=50% />
 </div>
 
+The feasibility of APPPM is easy to understand. Say you have an image with 30x30 resolution, if you reduce the image by
+1/2 using normal pooling, the resolution is directly reduced to 15x15.
+If you use convolution to extract features after the pooling layer, it is clear that you can only extract features once
+at 15x15 resolution. With an asymmetric pooling layer, the resolution is first reduced to 30x15, then to 15x15.
+If you still put the convolution behind the pooling layer to extract features, you can obviously extract more features
+at a more detailed resolution.
 
-APPPM的可行性很容易理解。假如你有一个30x30分辨率的图像，如果使用普通池化将图像降低1/2，则分辨率将直接被降低到15x15。
-如果你在池化层之后在使用卷积来提取特征，很明显你只可以在15x15分辨率提取一次特征。而使用非对称池化层，则分辨率将先被降低到30x15，之后是15x15。
-如果你依然将卷积放在池化层后面提取特征，很明显你可以在更细致的分辨率上提取更多的特征。
+Of course, from the list above, we also performed the operation of using asymmetric convolution to replace normal
+convolution as mentioned in DMRNet, and the operation of feature multiplexing as mentioned in DDRNet. But in the end,
+from the consideration of speed and accuracy, we finally proposed APPPM
 
-当然，从上边的列表我们也进行了DMRNet中提到的使用非对称卷积替换普通卷积的操作以及DDRNet提到的特征复用的操作。但最后从速度和精度考虑，我们最后提出了APPPM
 ### SAD
 
-[//]: # (![Simple Attention Decoder]&#40;figs/SAD.png&#41;)
 <div align=center>
     <img src=figs/SAD.png width=70% />
 </div>
-Simple Attention Decoder的具体结构
+Specific structure of Simple Attention Decoder
 
-## 使用
-### 准备数据
-从网站下载数据集([Cityscapes](https://www.cityscapes-dataset.com/ "Cityscapes")和[Camvid](http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/ "Camvid"))
+## Use
 
+### Prepare data
 
-如果Camvid出现Website not found!，请尝试从[Kaggle](https://www.kaggle.com/datasets/naureenmohammad/camvid-dataset?select=train)下载Camvid数据集
-### 预训练
-在实时语义分割,网络在ImageNet中预训练常见的方法，如果你希望使用ImageNet进行预训练可以参考我们的方法。
-我们使用了这个项目[ImageNet](https://github.com/jiweibo/ImageNet)来进行预训练.
-### 训练
-1.下载我们提供的预训练权重并放入`pretrained_models/imagenet/`中
+Download the datasets [Cityscapes](https://www.cityscapes-dataset.com/ "Cityscapes")
+and [Camvid](http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/ "Camvid") from the website. if Camvid comes up
+with Website not found!, try downloading the Camvid dataset
+from [Kaggle](https://www.kaggle.com/datasets/naureenmohammad/camvid-dataset?select=train)!
 
+### pre-training
 
-2.在`config`文件夹下的yaml文件中配置训练相关参数，如`ExpName(实验名称)`、`ROOT(数据集目录)`、`END_EPOCH(训练轮次)`等
+In real-time semantic segmentation,Network in ImageNet pre-training common methods, if you wish to use ImageNet for
+pre-training you can refer to our method. We have used this project [ImageNet](https://github.com/jiweibo/ImageNet) for
+pre-training.
 
-3.使用我们预设的脚本train.sh启动训练或者使用以下命令
+### train
 
+Download the pre-trained weights we provided and put them into `pretrained_models/imagenet/`
+
+Configure training parameters in the yaml file under the `config` folder, such
+as `ExpName (experiment name)`, `ROOT (dataset directory)`,` END_EPOCH (training rounds)`, etc.
+
+Start the training with our preset script train.sh or use the following command
 
 ```python tools/train.py --cfg configs/cityscapes/sanet_cityscapes_S.yaml```
 
+### evaluate
 
+Download the training weights we provided and put them in `pretrained_models/cityscapes/`or`pretrained_models/camvid/`
 
-### 评估
-1.下载我们提供的在Cityscapes或Camvid的训练权重并放到`pretrained_models/cityscapes/`或`pretrained_models/camvid/`
+Configure evaluation parameters in the yaml file in the `config` folder, such as `ExpName`
 
+```python tools/train.py --cfg=configs/cityscapes/sanet_cityscapes_S.yaml```
 
-2.在`config`文件夹中的yaml文件中配置评估相关参数，如`ExpName`
+If you wish to submit the results of your test dataset to Cityscapes, change the `TEST_SET` parameter in the yaml file
+in the `config` folder
 
+## pre-training weight
 
-3.如果希望将测试数据集的结果提交到Cityscapes上，请在`config`文件夹中的yaml文件中修改`TEST_SET`参数
-
-## 预训练模型
 #### ImageNet
 
 | Model | SANet-S                                                                                                   | SANet-M                                                                                                   | SANet-L                                                                                                   |
@@ -100,35 +114,53 @@ Simple Attention Decoder的具体结构
 |--------------------------------------------------------------------------------------------------|-------------|-----|
 | [SANet-S](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link) | 78.8        | 147 |
 | [SANet-M]()                                                                                      | -           |     |
-| [SANet-L]()                                                                                      | -    \  -   | -   |
+| [SANet-L]()                                                                                      | -           | -   |
 
+## Speed
 
-## 速度测试
-测试速度跟随了DDRNet和PIDNet的测试方法，速度测试在```models/sanet_speed.py```
-## 工具
-在计算机视觉中，更多的图像表达方式是有益的。但是不同的项目中提供的工具是不同的，在这里提供了我们使用的所用工具，希望可以帮助到其他人。
-### 分割图
-分割图是语义分割最经常使用的一种图像表达方式。
+The test speed follows the DDRNet and PIDNet test methodology, and the speed test is in ```models/sanet_speed.py```
 
-| ![图1](segmentation_image/main_outputs/aachen_000000_000019_leftImg8bit.png) | ![图2](segmentation_image/main_outputs/aachen_000001_000019_leftImg8bit.png) | ![图3](segmentation_image/main_outputs/cologne_000150_000019_leftImg8bit.png) |
-|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------|------------------------------------------------------------------------------|
-详细的代码在```tools/generate_segmentation_image.py```，并进行其他配置
-### 边界图
-边界图是显示单个物体边界的一种图像
+## Tools
 
-| ![边界图1](segmentation_image/boundary_outputs/aachen_000000_000019_leftImg8bit.png) | ![边界图2](segmentation_image/boundary_outputs/aachen_000001_000019_leftImg8bit.png) | ![边界图3](segmentation_image/boundary_outputs/cologne_000150_000019_leftImg8bit.png) |
-|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-详细的代码在```tools/generate_segmentation_image.py```，请将`boundary`设置为`True`,并进行其他配置
-### 热力图
-在图像分割任务中，热力图可以用来表示每个像素属于哪个类别或对象的概率。每个类别都有一个相应的热力图，显示了该类别的像素分布情况。
+In computer vision, more image representations are beneficial. But the tools provided in different projects are
+different, the used tools we use are provided here in the hope that they can help others.
 
-| ![热力图1](segmentation_image/heat_map/aachen_000000_000019_leftImg8bit-car-热力图-181316.png) | ![热力图2](segmentation_image/heat_map/aachen_000001_000019_leftImg8bit-road-热力图-181341.png) | ![热力图3](segmentation_image/heat_map/aachen_000014_000019_leftImg8bit-person-热力图-181328.png) |
-|------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-详细的代码在```tools/heat_map_drawing/heat_map_generator.py```，使用前需要先导入`pytorch_grad_cam`，并进行其他配置
-### 感受野
+### segmentation Image
 
-感受野是深度学习模型中神经元或卷积核在输入数据上的影响范围.
-#### 感受野图
+Segmentation maps are one of the most frequently used image representations for semantic segmentation.
+
+| ![img1](segmentation_image/main_outputs/aachen_000000_000019_leftImg8bit.png) | ![img2](segmentation_image/main_outputs/aachen_000001_000019_leftImg8bit.png) | ![图3](segmentation_image/main_outputs/cologne_000150_000019_leftImg8bit.png) |
+|-------------------------------------------------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+
+The detailed code ```tools/generate_segmentation_image.py``` with other configurations
+
+### boundary Image
+
+A boundary map is an image that shows the boundaries of a single object
+
+| ![bd_img1](segmentation_image/boundary_outputs/aachen_000000_000019_leftImg8bit.png) | ![bd_img2](segmentation_image/boundary_outputs/aachen_000001_000019_leftImg8bit.png) | ![bd_img3](segmentation_image/boundary_outputs/cologne_000150_000019_leftImg8bit.png) |
+|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+
+The detailed code is in ```tools/generate_segmentation_image.py```, please set ``boundary`` to ``True``, and make other
+configurations.
+
+### Heat Map Image
+
+In image segmentation tasks, heat maps can be used to represent the probability of which category or object each pixel
+belongs to. Each category has a corresponding heat map that shows the distribution of pixels in that category.
+
+| ![hm_img1](segmentation_image/heat_map/aachen_000000_000019_leftImg8bit-car-热力图-181316.png) | ![hm_img2](segmentation_image/heat_map/aachen_000001_000019_leftImg8bit-road-热力图-181341.png) | ![hm_img3](segmentation_image/heat_map/aachen_000014_000019_leftImg8bit-person-热力图-181328.png) |
+|---------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+
+The detailed code is in ```tools/heat_map_drawing/heat_map_generator.py```, you need to import ``pytorch_grad_cam`` and
+configure it before using it.
+
+### Receptive Field
+
+Receptive Field is the range of influence of a neuron or convolutional kernel in a deep learning model on the input
+data.
+
+#### Receptive Field Image
 
 <div align=center>
     <img src=figs/0.jpg width=5% />
@@ -138,22 +170,30 @@ Simple Attention Decoder的具体结构
     <img src=figs/L6_RF.png width=20% />
 </div>
 
-详细的代码在```tools/receptive_field_generator/main.py```，并进行其他配置
+The detailed code is in ```tools/receptive_field_generator/main.py``` with other configurations
 
-#### 感受野计算
-感受野的计算工具在```tools/receptive_field_tools/sanet_receptive_field_calculator.py```
+#### Receptive Field Calculations
 
+The Receptive Field calculation tool is at ``tools/receptive_field_tools/sanet_receptive_field_calculator.py``.
 
-### 多类别边界损失
-这是在MSFNet中提到的一种方式。不同于常见的边界损失只有两种分类(是或不是边界)，多类别的边界损失按照数据集的类别分成了多种类别(是什么类别的边界)。
-我们当时尝试为SANet加入这种方法，但是并没有找到MSFNet提供的相应代码。因此，我们重新实现了这种多类别的方法。但是，我们加入这种方法的SANet性能表现的并不理想。
+### Multi-category boundary losses
+
+This is an approach mentioned in MSFNet. Unlike the common boundary loss which has only two classifications (yes or no
+boundaries), the multi-category boundary loss splits into multiple categories (what categories are boundaries) according
+to the category of the dataset.
+We tried to incorporate this approach for SANet at that time, but did not find the corresponding code provided by
+MSFNet. Therefore, we re-implemented this multi-category approach. However, the performance of the SANet to which we
+added this approach did not perform well.
 <div align=center>
     <img src=segmentation_image/multi_class_boundary_detection/edge.png width=30% />
-    
+
 </div>
 
-详细的代码在```tools/multi_class_boundary_detection/multi_class_boundary_detection.py```，并进行其他配置
-## 引用
+The detailed code is in ```tools/multi_class_boundary_detection/multi_class_boundary_detection.py``` with other
+configurations
+
+## Citation
+
 ```
 @misc{wang2023spatialassistant,
       title={Spatial-Assistant Encoder-Decoder Network for Real Time Semantic Segmentation}, 
