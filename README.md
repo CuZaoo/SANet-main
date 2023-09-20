@@ -125,7 +125,7 @@ The test speed follows the DDRNet and PIDNet test methodology, and the speed tes
 In computer vision, more image representations are beneficial. But the tools provided in different projects are
 different, the used tools we use are provided here in the hope that they can help others.
 
-### segmentation Image
+### Segmentation Image
 
 Segmentation maps are one of the most frequently used image representations for semantic segmentation.
 
@@ -134,7 +134,7 @@ Segmentation maps are one of the most frequently used image representations for 
 
 The detailed code ```tools/generate_segmentation_image.py``` with other configurations
 
-### boundary Image
+### Boundary Image
 
 A boundary map is an image that shows the boundaries of a single object
 
