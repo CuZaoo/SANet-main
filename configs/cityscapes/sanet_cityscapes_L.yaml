@@ -12,7 +12,7 @@ DATASET:
   DATASET: cityscapes
   #  ROOT: data/
   ROOT: /home/ubuntu/Projects/PIDNet/data/
-  TEST_SET: 'list/cityscapes/test.lst'
+  TEST_SET: 'list/cityscapes/val.lst'
   TRAIN_SET: 'list/cityscapes/train.lst'
   NUM_CLASSES: 19
 MODEL:
@@ -51,8 +51,8 @@ TEST:
     - 1024
   BASE_SIZE: 2048
   BATCH_SIZE_PER_GPU: 1
-  FLIP_TEST: true
-  MULTI_SCALE: true
+  FLIP_TEST: false
+  MULTI_SCALE: false
   SCALE_LIST: [ 0.5,0.75,1.0,1.25 ]
   #  SCALE_LIST: [ 1 ]
   #0.5,0.75,1.0,1.25,1.5,1.75

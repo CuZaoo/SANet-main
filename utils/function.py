@@ -63,8 +63,8 @@ def train(config, epoch, num_epoch, epoch_iters, base_lr,
                                   base_lr,
                                   num_iters,
                                   i_iter+cur_iters)
-
-        if i_iter % config.PRINT_FREQ == 0:
+        # print(str(i_iter)+":"+str(epoch_iters))
+        if i_iter % config.PRINT_FREQ == 0 or i_iter == epoch_iters - 1:
             msg = 'Epoch: [{}/{}] Iter:[{}/{}], Time: {:.2f}, ' \
                   'lr: {}, Loss: {:.6f}, Acc:{:.6f}, Semantic loss: {:.6f}, BCE loss: {:.6f}, SB loss: {:.6f}' .format(
                       epoch, num_epoch, i_iter, epoch_iters,

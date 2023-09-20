@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import logging
 BatchNorm2d = nn.BatchNorm2d
 bn_mom = 0.1
 
@@ -722,10 +722,22 @@ def DualResNet_imagenet(cfg, pretrained=False):
 
     if pretrained:
         print("Using pretrained")
-        pretrained_state = torch.load(cfg.MODEL.PRETRAINED, map_location='cpu')["state_dict"]
+        pretrained_state = torch.load(cfg.MODEL.PRETRAINED, map_location='cpu')
+        if "state_dict" in pretrained_state:
+            pretrained_state = pretrained_state["state_dict"]
         model_dict = model.state_dict()
-        pretrained_state = {k: v for k, v in pretrained_state.items() if
-                            (k in model_dict and v.shape == model_dict[k].shape)}
+        # cityscapes
+        if 'cityscapes' in cfg.MODEL.PRETRAINED:
+            pretrained_state = {k[6:]: v for k, v in pretrained_state.items() if
+                                (k[6:] in model_dict and v.shape == model_dict[k[6:]].shape)}
+        # imagenet
+        else:
+            pretrained_state = {k: v for k, v in pretrained_state.items() if
+                                (k in model_dict and v.shape == model_dict[k].shape)}
+        msg = 'Loaded {} parameters!'.format(len(pretrained_state))
+        logging.info('Attention!!!')
+        logging.info(msg)
+        logging.info('Over!!!')
         model_dict.update(pretrained_state)
         model.load_state_dict(model_dict, strict=False)
     return model

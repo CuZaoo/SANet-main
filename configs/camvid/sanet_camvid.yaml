@@ -18,7 +18,7 @@ DATASET:
 MODEL:
   NAME: sanet
   NUM_OUTPUTS: 2
-  PRETRAINED: "pretrained_models/cityscapes/sanet_S.pt"
+  PRETRAINED: "pretrained_models/cityscapes/sanet_M.pt"
 LOSS:
   USE_OHEM: true
   OHEMTHRES: 0.9
@@ -26,18 +26,18 @@ LOSS:
   BALANCE_WEIGHTS: [0.4, 1.0]
   SB_WEIGHTS: 1.0
 TRAIN:
-  ExpName: 'SANet_camvid_学习率0.01'
+  ExpName: 'SANet_M_学习率0.001_12'
   IMAGE_SIZE:
   - 960
   - 720
   BASE_SIZE: 960
-  BATCH_SIZE_PER_GPU: 8
+  BATCH_SIZE_PER_GPU: 12
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 150
   RESUME: false
   OPTIMIZER: sgd
-  LR: 0.01
+  LR: 0.001
   WD: 0.0005
   MOMENTUM: 0.9
   NESTEROV: true

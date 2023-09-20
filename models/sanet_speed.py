@@ -115,112 +115,44 @@ class DilatedSpatialPath(nn.Module):
         return out
 
 
-class AAPPM(nn.Module):
+
+class TAPPM(nn.Module):
     def __init__(self, inplanes, branch_planes, outplanes):
-        super(AAPPM, self).__init__()
-        self.scale1 = nn.Sequential(nn.AvgPool2d(kernel_size=5, stride=2, padding=2),
-                                    # BatchNorm2d(inplanes, momentum=bn_mom),
-                                    nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
-                                    )
-        self.scale2 = nn.Sequential(nn.AvgPool2d(kernel_size=9, stride=4, padding=4),
-                                    # BatchNorm2d(inplanes, momentum=bn_mom),
-                                    nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
-                                    )
-        self.scale3 = nn.Sequential(nn.AvgPool2d(kernel_size=17, stride=8, padding=8),
-                                    # BatchNorm2d(inplanes, momentum=bn_mom),
-                                    nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
-                                    )
-        self.scale4 = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)),
-                                    # BatchNorm2d(inplanes, momentum=bn_mom),
-                                    nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
-                                    )
-        self.scale0 = nn.Sequential(
-            # BatchNorm2d(inplanes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
-        )
-        self.process1 = nn.Sequential(
-            # BatchNorm2d(branch_planes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 1), padding=(1, 0), bias=False),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=(1, 3), padding=(0, 1), bias=False)
-        )
-        self.process2 = nn.Sequential(
-            # BatchNorm2d(branch_planes, momentum=bn_mom),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 1), padding=(1, 0), bias=False),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=(1, 3), padding=(0, 1), bias=False)
-        )
-        self.process3 = nn.Sequential(
-            # BatchNorm2d(branch_planes, momentum=bn_mom),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 1), padding=(1, 0), bias=False),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=(1, 3), padding=(0, 1), bias=False)
-        )
-        self.process4 = nn.Sequential(
-            # BatchNorm2d(branch_planes, momentum=bn_mom),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 1), padding=(1, 0), bias=False),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=(1, 3), padding=(0, 1), bias=False)
-        )
-        self.compression = nn.Sequential(
-            # BatchNorm2d(branch_planes * 5, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes * 5, outplanes, kernel_size=1, bias=False),
-        )
-        self.shortcut = nn.Sequential(
-            # BatchNorm2d(inplanes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(inplanes, outplanes, kernel_size=1, bias=False),
-        )
+        super(TAPPM, self).__init__()
 
-    def forward(self, x):
-        # x = self.downsample(x)
-        width = x.shape[-1]
-        height = x.shape[-2]
-        x_list = []
-
-        x_list.append(self.scale0(x))
-        x_list.append(self.process1((F.interpolate(self.scale1(x),
-                                                   size=[height, width],
-                                                   mode='bilinear') + x_list[0])))
-        x_list.append((self.process2((F.interpolate(self.scale2(x),
-                                                    size=[height, width],
-                                                    mode='bilinear') + x_list[1]))))
-        x_list.append(self.process3((F.interpolate(self.scale3(x),
-                                                   size=[height, width],
-                                                   mode='bilinear') + x_list[2])))
-        x_list.append(self.process4((F.interpolate(self.scale4(x),
-                                                   size=[height, width],
-                                                   mode='bilinear') + x_list[3])))
-
-        out = self.compression(torch.cat(x_list, 1)) + self.shortcut(x)
-        return out
-
-
-class DAPPM(nn.Module):
-    def __init__(self, inplanes, branch_planes, outplanes):
-        super(DAPPM, self).__init__()
-        self.scale1 = nn.Sequential(nn.AvgPool2d(kernel_size=5, stride=2, padding=2),
+        self.scale1 = nn.Sequential(nn.AvgPool2d(kernel_size=(1, 5), stride=(1, 2), padding=(0, 2)),
                                     BatchNorm2d(inplanes, momentum=bn_mom),
                                     nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
+                                    nn.Conv2d(inplanes, branch_planes, kernel_size=(3, 3), padding=(1, 1), bias=False),
                                     )
-        self.scale2 = nn.Sequential(nn.AvgPool2d(kernel_size=9, stride=4, padding=4),
+        self.scale11 = nn.Sequential(nn.AvgPool2d(kernel_size=(5, 1), stride=(2, 1), padding=(2, 0)),
+                                     BatchNorm2d(branch_planes, momentum=bn_mom),
+                                     nn.ReLU(inplace=True),
+                                     nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 3), padding=(1, 1),
+                                               bias=False),
+                                     )
+        self.scale2 = nn.Sequential(nn.AvgPool2d(kernel_size=(1, 9), stride=(1, 4), padding=(0, 4)),
                                     BatchNorm2d(inplanes, momentum=bn_mom),
                                     nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
+                                    nn.Conv2d(inplanes, branch_planes, kernel_size=(3, 3), padding=(1, 1), bias=False),
                                     )
-        self.scale3 = nn.Sequential(nn.AvgPool2d(kernel_size=17, stride=8, padding=8),
+        self.scale22 = nn.Sequential(nn.AvgPool2d(kernel_size=(9, 1), stride=(4, 1), padding=(4, 0)),
+                                     BatchNorm2d(branch_planes, momentum=bn_mom),
+                                     nn.ReLU(inplace=True),
+                                     nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 3), padding=(1, 1),
+                                               bias=False),
+                                     )
+        self.scale3 = nn.Sequential(nn.AvgPool2d(kernel_size=(1, 17), stride=(1, 8), padding=(0, 8)),
                                     BatchNorm2d(inplanes, momentum=bn_mom),
                                     nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
+                                    nn.Conv2d(inplanes, branch_planes, kernel_size=(3, 3), padding=(1, 1), bias=False),
                                     )
+        self.scale33 = nn.Sequential(nn.AvgPool2d(kernel_size=(17, 1), stride=(8, 1), padding=(8, 0)),
+                                     BatchNorm2d(branch_planes, momentum=bn_mom),
+                                     nn.ReLU(inplace=True),
+                                     nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 3), padding=(1, 1),
+                                               bias=False)
+                                     )
         self.scale4 = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)),
                                     BatchNorm2d(inplanes, momentum=bn_mom),
                                     nn.ReLU(inplace=True),
@@ -232,24 +164,24 @@ class DAPPM(nn.Module):
             nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
         )
         self.process1 = nn.Sequential(
-            BatchNorm2d(branch_planes, momentum=bn_mom),
+            BatchNorm2d(inplanes, momentum=bn_mom),
             nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(inplanes, branch_planes, kernel_size=1, padding=0, bias=False),
         )
         self.process2 = nn.Sequential(
-            BatchNorm2d(branch_planes, momentum=bn_mom),
+            BatchNorm2d(inplanes, momentum=bn_mom),
             nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(inplanes, branch_planes, kernel_size=1, padding=0, bias=False),
         )
         self.process3 = nn.Sequential(
-            BatchNorm2d(branch_planes, momentum=bn_mom),
+            BatchNorm2d(inplanes, momentum=bn_mom),
             nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(inplanes, branch_planes, kernel_size=1, padding=0, bias=False),
         )
         self.process4 = nn.Sequential(
-            BatchNorm2d(branch_planes, momentum=bn_mom),
+            BatchNorm2d(inplanes, momentum=bn_mom),
             nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes, branch_planes, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(inplanes, branch_planes, kernel_size=1, padding=1, bias=False),
         )
         self.compression = nn.Sequential(
             BatchNorm2d(branch_planes * 5, momentum=bn_mom),
@@ -261,151 +193,9 @@ class DAPPM(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(inplanes, outplanes, kernel_size=1, bias=False),
         )
-
-    def forward(self, x):
-        # x = self.downsample(x)
-        width = x.shape[-1]
-        height = x.shape[-2]
-        x_list = []
-
-        x_list.append(self.scale0(x))
-        x_list.append(self.process1((F.interpolate(self.scale1(x),
-                                                   size=[height, width],
-                                                   mode='bilinear') + x_list[0])))
-        x_list.append((self.process2((F.interpolate(self.scale2(x),
-                                                    size=[height, width],
-                                                    mode='bilinear') + x_list[1]))))
-        x_list.append(self.process3((F.interpolate(self.scale3(x),
-                                                   size=[height, width],
-                                                   mode='bilinear') + x_list[2])))
-        x_list.append(self.process4((F.interpolate(self.scale4(x),
-                                                   size=[height, width],
-                                                   mode='bilinear') + x_list[3])))
-
-        out = self.compression(torch.cat(x_list, 1)) + self.shortcut(x)
-        return out
-
-
-class SPPM(nn.Module):
-    """
-    Simple Pyramid Pooling context Module.
-    """
-
-    def __init__(self,
-                 in_channels=512,
-                 inter_channels=128,
-                 out_channels=128,
-                 pool_sizes=[1, 2, 4],
-                 align_corners=False):
-        """
-        :param inter_channels: num channels in each pooling branch.
-        :param out_channels: The number of output channels after pyramid pooling module.
-        :param pool_sizes: spatial output sizes of the pooled feature maps.
-        """
-        super().__init__()
-        self.branches = nn.ModuleList([
-            nn.Sequential(
-                nn.AdaptiveAvgPool2d(pool_size),
-                ConvBNReLU(in_channels, inter_channels, kernel_size=1, bias=False),
-            ) for pool_size in pool_sizes
-        ])
-        self.conv_out = ConvBNReLU(inter_channels, out_channels, kernel_size=3, padding=1, bias=False)
-        self.out_channels = out_channels
-        self.align_corners = align_corners
-        self.pool_sizes = pool_sizes
-
-    def forward(self, x):
-        out = None
-        input_shape = x.shape[2:]
-        for branch in self.branches:
-            y = branch(x)
-            y = F.interpolate(y, size=input_shape, mode='bilinear', align_corners=False)
-            out = y if out is None else out + y
-        out = self.conv_out(out)
-        return out
-
-
-class TAPPM(nn.Module):
-    def __init__(self, inplanes, branch_planes, outplanes):
-        super(TAPPM, self).__init__()
-
-        self.scale1 = nn.Sequential(nn.AvgPool2d(kernel_size=(1, 5), stride=(1, 2), padding=(0, 2)),
-                                    # BatchNorm2d(inplanes, momentum=bn_mom),
-                                    nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=(3, 3), padding=(1, 1), bias=False),
-                                    )
-        self.scale11 = nn.Sequential(nn.AvgPool2d(kernel_size=(5, 1), stride=(2, 1), padding=(2, 0)),
-                                     # BatchNorm2d(branch_planes, momentum=bn_mom),
-                                     nn.ReLU(inplace=True),
-                                     nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 3), padding=(1, 1),
-                                               bias=False),
-                                     )
-        self.scale2 = nn.Sequential(nn.AvgPool2d(kernel_size=(1, 9), stride=(1, 4), padding=(0, 4)),
-                                    # BatchNorm2d(inplanes, momentum=bn_mom),
-                                    nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=(3, 3), padding=(1, 1), bias=False),
-                                    )
-        self.scale22 = nn.Sequential(nn.AvgPool2d(kernel_size=(9, 1), stride=(4, 1), padding=(4, 0)),
-                                     # BatchNorm2d(branch_planes, momentum=bn_mom),
-                                     nn.ReLU(inplace=True),
-                                     nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 3), padding=(1, 1),
-                                               bias=False),
-                                     )
-        self.scale3 = nn.Sequential(nn.AvgPool2d(kernel_size=(1, 17), stride=(1, 8), padding=(0, 8)),
-                                    # BatchNorm2d(inplanes, momentum=bn_mom),
-                                    nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=(3, 3), padding=(1, 1), bias=False),
-                                    )
-        self.scale33 = nn.Sequential(nn.AvgPool2d(kernel_size=(17, 1), stride=(8, 1), padding=(8, 0)),
-                                     # BatchNorm2d(branch_planes, momentum=bn_mom),
-                                     nn.ReLU(inplace=True),
-                                     nn.Conv2d(branch_planes, branch_planes, kernel_size=(3, 3), padding=(1, 1),
-                                               bias=False)
-                                     )
-        self.scale4 = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)),
-                                    # BatchNorm2d(inplanes, momentum=bn_mom),
-                                    nn.ReLU(inplace=True),
-                                    nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
-                                    )
-        self.scale0 = nn.Sequential(
-            # BatchNorm2d(inplanes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(inplanes, branch_planes, kernel_size=1, bias=False),
-        )
-        self.process1 = nn.Sequential(
-            # BatchNorm2d(inplanes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(inplanes, branch_planes, kernel_size=1, padding=0, bias=False),
-        )
-        self.process2 = nn.Sequential(
-            # BatchNorm2d(inplanes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(inplanes, branch_planes, kernel_size=1, padding=0, bias=False),
-        )
-        self.process3 = nn.Sequential(
-            # BatchNorm2d(inplanes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(inplanes, branch_planes, kernel_size=1, padding=0, bias=False),
-        )
-        self.process4 = nn.Sequential(
-            # BatchNorm2d(inplanes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(inplanes, branch_planes, kernel_size=1, padding=1, bias=False),
-        )
-        self.compression = nn.Sequential(
-            # BatchNorm2d(branch_planes * 5, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(branch_planes * 5, outplanes, kernel_size=1, bias=False),
-        )
-        self.shortcut = nn.Sequential(
-            # BatchNorm2d(inplanes, momentum=bn_mom),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(inplanes, outplanes, kernel_size=1, bias=False),
-        )
         self.atten = BiAttention(outplanes)
 
     def forward(self, x):
-        # x = self.downsample(x)
         width = x.shape[-1]
         height = x.shape[-2]
         x_list = []
@@ -530,9 +320,7 @@ class DualResNet(nn.Module):
         self.layer4 = self._make_layer(block, planes * 2, planes * 4, layers[2], stride=2)
         self.layer5 = self._make_layer(block, planes * 4, planes * 8, layers[3], stride=2)
         self.layer6 = self._make_layer(Bottleneck, planes * 8, planes * 8, 1, stride=2)
-        # self.spp = TAPPM(planes * 16, spp_planes, planes * 4)
-        self.spp = AAPPM(planes * 16, spp_planes, planes * 4)
-        # self.spp = SPPM()
+        self.spp = TAPPM(planes * 16, spp_planes, planes * 4)
         # Spatial Path
         self.dp1 = DilatedSpatialPath(planes * 2, planes * 4, D_list=[1, 2, 5])
         self.dp2 = DilatedSpatialPath(planes * 4, planes * 4, D_list=[7, 13])
@@ -606,10 +394,6 @@ class DualResNet(nn.Module):
         x = self.layer6(self.relu(x))
         x = self.spp(self.relu(x))
         x = self.decoder(dp1, dp2, dp, x)
-        # x = self.avgpool(x)
-        # x = x.view(x.size(0), -1)
-        # x = self.classifier(x)
-        # return x
 
         x = self.final_layer(x)
         if self.augment:
@@ -663,14 +447,12 @@ def DualResNet_imagenet(cfg, pretrained=False):
 
 
 def get_imagenet_model():
-    print("Net_新的Decoder_减少语义通道_825")
     model = DualResNet(BasicBlock, [2, 2, 2, 2], num_classes=1000, planes=32, spp_planes=128, head_planes=64,
                        augment=False)
     return model
 
 
 def get_seg_model(cfg, imgnet_pretrained, **kwargs):
-    print("Net_新的Decoder_减少语义通道_825")
     model = DualResNet_imagenet(cfg, pretrained=imgnet_pretrained)
     return model
 
@@ -685,15 +467,11 @@ def get_pred_model():
 import time
 
 if __name__ == '__main__':
-    # Comment batchnorms here and in model_utils before testing speed since the batchnorm could be integrated into conv operation
-    # (do not comment all, just the batchnorm following its corresponding conv layer)
     device = torch.device('cuda')
     model = get_pred_model()
     import time
-
-    # torch.backends.cudnn.enabled = True
-    # torch.backends.cudnn.benchmark = True
-
+    torch.backends.cudnn.enabled = True
+    torch.backends.cudnn.benchmark = True
     model.eval()
     model.to(device)
     iterations = None
