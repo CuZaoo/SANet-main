@@ -10,8 +10,7 @@ PRINT_FREQ: 10
 
 DATASET:
   DATASET: cityscapes
-  #  ROOT: data/
-  ROOT: /home/ubuntu/Projects/PIDNet/data/
+  ROOT: data/
   TEST_SET: 'list/cityscapes/val.lst'
   TRAIN_SET: 'list/cityscapes/train.lst'
   NUM_CLASSES: 19
@@ -26,7 +25,7 @@ LOSS:
   BALANCE_WEIGHTS: [ 0.4, 1.0 ]
   SB_WEIGHTS: 1.0
 TRAIN:
-  ExpName: 'SANet_LLLL_scale222222'
+  ExpName: 'SANet_L'
   IMAGE_SIZE:
     - 1024
     - 1024
@@ -54,9 +53,5 @@ TEST:
   FLIP_TEST: false
   MULTI_SCALE: false
   SCALE_LIST: [ 0.5,0.75,1.0,1.25 ]
-  #  SCALE_LIST: [ 1 ]
-  #0.5,0.75,1.0,1.25,1.5,1.75
-  #  MODEL_FILE: 'pretrained_models/cityscapes/best_val_smaller.pth'
-  #  MODEL_FILE: 'best/Net_新的Decoder_减少语义通道_825_7859.pt'
-  MODEL_FILE: 'pretrained_models/cityscapes/SANet_L33273.pt'
+  MODEL_FILE: 'pretrained_models/cityscapes/SANet_L.pt'
   OUTPUT_INDEX: 1

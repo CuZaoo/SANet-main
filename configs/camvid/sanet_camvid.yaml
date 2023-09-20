@@ -10,15 +10,14 @@ PRINT_FREQ: 10
 
 DATASET:
   DATASET: camvid
-  ROOT: /home/ubuntu/Projects/PIDNet/data/
-#  ROOT: data/
+  ROOT: data/
   TEST_SET: 'list/camvid/test.lst'
   TRAIN_SET: 'list/camvid/trainval.lst'
   NUM_CLASSES: 11
 MODEL:
   NAME: sanet
   NUM_OUTPUTS: 2
-  PRETRAINED: "pretrained_models/cityscapes/sanet_M.pt"
+  PRETRAINED: "pretrained_models/cityscapes/sanet_S.pt"
 LOSS:
   USE_OHEM: true
   OHEMTHRES: 0.9
@@ -26,12 +25,12 @@ LOSS:
   BALANCE_WEIGHTS: [0.4, 1.0]
   SB_WEIGHTS: 1.0
 TRAIN:
-  ExpName: 'SANet_M_学习率0.001_12'
+  ExpName: 'SANet_S'
   IMAGE_SIZE:
   - 960
   - 720
   BASE_SIZE: 960
-  BATCH_SIZE_PER_GPU: 12
+  BATCH_SIZE_PER_GPU: 8
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 150

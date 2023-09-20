@@ -10,9 +10,7 @@ PRINT_FREQ: 10
 
 DATASET:
   DATASET: cityscapes
-#  ROOT: data/
-#  ROOT: /home/ubuntu/mydata2/PIDNet/data/
-  ROOT: /home/ubuntu/Projects/PIDNet/data/
+  ROOT: data/
   TEST_SET: 'list/cityscapes/val.lst'
   TRAIN_SET: 'list/cityscapes/train.lst'
   NUM_CLASSES: 19
@@ -32,7 +30,7 @@ TRAIN:
   - 1024
   - 1024
   BASE_SIZE: 2048
-  BATCH_SIZE_PER_GPU: 8
+  BATCH_SIZE_PER_GPU: 12
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 484
@@ -54,5 +52,6 @@ TEST:
   BATCH_SIZE_PER_GPU: 6
   FLIP_TEST: false
   MULTI_SCALE: false
+  SCALE_LIST: [ 0.5,0.75,1.0,1.25 ]
   MODEL_FILE: 'pretrained_models/cityscapes/sanet_S.pt'
   OUTPUT_INDEX: 1
