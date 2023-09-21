@@ -62,7 +62,7 @@ Specific structure of Simple Attention Decoder
 Download the datasets [Cityscapes](https://www.cityscapes-dataset.com/ "Cityscapes")
 and [Camvid](http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/ "Camvid") from the website. if Camvid comes up
 with Website not found!, try downloading the Camvid dataset
-from [Kaggle](https://www.kaggle.com/datasets/naureenmohammad/camvid-dataset?select=train)!
+from [Motion-based Segmentation and Recognition Dataset](http://web4.cs.ucl.ac.uk/staff/g.brostow/MotionSegRecData/) or  [Kaggle](https://www.kaggle.com/datasets/naureenmohammad/camvid-dataset?select=train)!
 
 ### pre-training
 
