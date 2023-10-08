@@ -40,20 +40,22 @@ feasible approach.
 The feasibility of APPPM is easy to understand. Say you have an image with 30x30 resolution, if you reduce the image by
 1/2 using normal pooling, the resolution is directly reduced to 15x15.
 If you use convolution to extract features after the pooling layer, it is clear that you can only extract features once
-at 15x15 resolution. With an asymmetric pooling layer, the resolution is first reduced to 30x15, then to 15x15.
+at 15x15 resolution. With [README_zh.md](README_zh.md)an asymmetric pooling layer, the resolution is first reduced to
+30x15, then to 15x15.
 If you still put the convolution behind the pooling layer to extract features, you can obviously extract more features
 at a more detailed resolution.
 
 Of course, from the list above, we also performed the operation of using asymmetric convolution to replace normal
 convolution as mentioned in DMRNet, and the operation of feature multiplexing as mentioned in DDRNet. But in the end,
-from the consideration of speed and accuracy, we finally proposed APPPM.(In the beginning, the model was referred to as TAPPM and in SANet's modeling code as TAPPM)
+from the consideration of speed and accuracy, we finally proposed APPPM.(In the beginning, the model was referred to as
+TAPPM and in SANet's modeling code as TAPPM)
 
 ### SAD
 
 <div align=center>
     <img src=figs/SAD.png width=70% />
 </div>
-Specific structure of Simple Attention Decoder
+Specific structure of Simple Attention Decoder[README_zh.md](README_zh.md)
 
 ## Use
 
@@ -62,7 +64,11 @@ Specific structure of Simple Attention Decoder
 Download the datasets [Cityscapes](https://www.cityscapes-dataset.com/ "Cityscapes")
 and [Camvid](http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/ "Camvid") from the website. if Camvid comes up
 with Website not found!, try downloading the Camvid dataset
-from [Motion-based Segmentation and Recognition Dataset](http://web4.cs.ucl.ac.uk/staff/g.brostow/MotionSegRecData/) or  [Kaggle](https://www.kaggle.com/datasets/naureenmohammad/camvid-dataset?select=train)!
+from [Motion-based Segmentation and Recognition Dataset](http://web4.cs.ucl.ac.uk/staff/g.brostow/MotionSegRecData/)
+or  [Kaggle](https://www.kaggle.com/datasets/naureenmohammad/camvid-dataset?select=train)!
+
+To further validate the model, we trained on
+the [GTAV dataset](https://download.visinf.tu-darmstadt.de/data/from_games/) with nearly 25,000 sheets
 
 ### pre-training
 
@@ -106,15 +112,22 @@ in the `config` folder
 |--------------------------------------------------------------------------------------------------|-------------|-------------|------|
 | [SANet-S](https://drive.google.com/file/d/15mTmKPu7DZ_BSkq2ZGyrCX6VQFG4qYn9/view?usp=drive_link) | 78.6 \ 79.9 | 77.2 \ 78.4 | 65.1 |
 | [SANet-M](https://drive.google.com/file/d/1SpqLdzzinzJmcSQR08BATJxRfkBjdNx2/view?usp=drive_link) | 78.8 \ 80.2 | 77.6 \ 78.8 | 52.7 |
-| [SANet-L](https://drive.google.com/file/d/1D3u4PexPrsAUAFgHIgCuFDpPgXfB5oC1/view?usp=drive_link) | 79.2 \ 80.6 | -    \  -   | -    |
+| [SANet-L](https://drive.google.com/file/d/1D3u4PexPrsAUAFgHIgCuFDpPgXfB5oC1/view?usp=drive_link) | 79.2 \ 80.6 | 78.1 \ 79.0 | 39.6 |
 
 #### Camvid
 
 | Model                                                                                            | Test(%mIou) | FPS |
 |--------------------------------------------------------------------------------------------------|-------------|-----|
 | [SANet-S](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link) | 78.8        | 147 |
-| [SANet-M]()                                                                                      | -           |     |
-| [SANet-L]()                                                                                      | -           | -   |
+| [SANet-M](https://drive.google.com/file/d/1YTcfIfl99xYQE98aUyiQkZqrg95g1qlm/view?usp=drive_link) | 79.5        | 126 |
+
+#### GTAV
+| Model                                                                                                         | Test(%mIou) |
+|---------------------------------------------------------------------------------------------------------------|-------------|
+| [PIDNet-S(无预训练)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link)       | 38.2        | 
+| [SANet-S(无预训练)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link)        | 38.5        | 
+| [PIDNet-S(Cityscapes)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link) | 45.0        | 
+| [SANet-S(Cityscapes)](https://drive.google.com/file/d/1YTcfIfl99xYQE98aUyiQkZqrg95g1qlm/view?usp=drive_link)  | 48.0        | 
 
 ## Speed
 

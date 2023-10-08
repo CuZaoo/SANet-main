@@ -39,7 +39,8 @@ APPPM的可行性很容易理解。假如你有一个30x30分辨率的图像，�
 如果你在池化层之后在使用卷积来提取特征，很明显你只可以在15x15分辨率提取一次特征。而使用非对称池化层，则分辨率将先被降低到30x15，之后是15x15。
 如果你依然将卷积放在池化层后面提取特征，很明显你可以在更细致的分辨率上提取更多的特征。
 
-当然，从上边的列表我们也进行了DMRNet中提到的使用非对称卷积替换普通卷积的操作以及DDRNet提到的特征复用的操作。但最后从速度和精度考虑，我们最后提出了APPPM(在刚开始，该模型被称为TAPPM，且在SANet的模型代码中也是TAPPM)
+当然，从上边的列表我们也进行了DMRNet中提到的使用非对称卷积替换普通卷积的操作以及DDRNet提到的特征复用的操作。但最后从速度和精度考虑，我们最后提出了APPPM(
+在刚开始，该模型被称为TAPPM，且在SANet的模型代码中也是TAPPM)
 
 ### SAD
 
@@ -57,7 +58,11 @@ Simple Attention Decoder的具体结构
 和[Camvid](http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/ "Camvid"))
 
 如果Camvid出现Website not found!
-，请尝试从[Motion-based Segmentation and Recognition Dataset](http://web4.cs.ucl.ac.uk/staff/g.brostow/MotionSegRecData/) 或 [Kaggle](https://www.kaggle.com/datasets/naureenmohammad/camvid-dataset?select=train)下载Camvid数据集
+，请尝试从[Motion-based Segmentation and Recognition Dataset](http://web4.cs.ucl.ac.uk/staff/g.brostow/MotionSegRecData/)
+或 [Kaggle](https://www.kaggle.com/datasets/naureenmohammad/camvid-dataset?select=train)下载Camvid数据集
+
+为了进一步验证模型，我们在具有近25000张的[GTAV数据集](https://download.visinf.tu-darmstadt.de/data/from_games/)上进行了训练
+需要注意的是images的17705.png和15188.png是无效的图像，我们在list/gtav/*.lst文件中没有使用这两张图片
 
 ### 预训练
 
@@ -100,15 +105,23 @@ Simple Attention Decoder的具体结构
 |--------------------------------------------------------------------------------------------------|-------------|-------------|------|
 | [SANet-S](https://drive.google.com/file/d/15mTmKPu7DZ_BSkq2ZGyrCX6VQFG4qYn9/view?usp=drive_link) | 78.6 \ 79.9 | 77.2 \ 78.4 | 65.1 |
 | [SANet-M](https://drive.google.com/file/d/1SpqLdzzinzJmcSQR08BATJxRfkBjdNx2/view?usp=drive_link) | 78.8 \ 80.2 | 77.6 \ 78.8 | 52.7 |
-| [SANet-L](https://drive.google.com/file/d/1D3u4PexPrsAUAFgHIgCuFDpPgXfB5oC1/view?usp=drive_link) | 79.2 \ 80.6 | -    \  -   | -    |
+| [SANet-L](https://drive.google.com/file/d/1D3u4PexPrsAUAFgHIgCuFDpPgXfB5oC1/view?usp=drive_link) | 79.2 \ 80.6 | 78.1 \ 79.0 | 39.6 |
 
 #### Camvid
 
 | Model                                                                                            | Test(%mIou) | FPS |
 |--------------------------------------------------------------------------------------------------|-------------|-----|
 | [SANet-S](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link) | 78.8        | 147 |
-| [SANet-M]()                                                                                      | -           |     |
-| [SANet-L]()                                                                                      | -           | -   |
+| [SANet-M](https://drive.google.com/file/d/1YTcfIfl99xYQE98aUyiQkZqrg95g1qlm/view?usp=drive_link) | 79.5        | 126 |
+
+#### GTAV
+
+| Model                                                                                                         | Test(%mIou) |
+|---------------------------------------------------------------------------------------------------------------|-------------|
+| [PIDNet-S(无预训练)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link)       | 38.2        | 
+| [SANet-S(无预训练)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link)        | 38.5        | 
+| [PIDNet-S(Cityscapes)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link) | 45.0        | 
+| [SANet-S(Cityscapes)](https://drive.google.com/file/d/1YTcfIfl99xYQE98aUyiQkZqrg95g1qlm/view?usp=drive_link)  | 48.0        | 
 
 ## 速度测试
 
