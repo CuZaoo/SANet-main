@@ -122,12 +122,12 @@ in the `config` folder
 | [SANet-M](https://drive.google.com/file/d/1YTcfIfl99xYQE98aUyiQkZqrg95g1qlm/view?usp=drive_link) | 79.5        | 126 |
 
 #### GTAV
-| Model                                                                                                         | Test(%mIou) |
-|---------------------------------------------------------------------------------------------------------------|-------------|
-| [PIDNet-S(无预训练)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link)       | 38.2        | 
-| [SANet-S(无预训练)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link)        | 38.5        | 
-| [PIDNet-S(Cityscapes)](https://drive.google.com/file/d/1b3a6zggpTNDk0ktLZ5a7w8sw7vS1BPDC/view?usp=drive_link) | 45.0        | 
-| [SANet-S(Cityscapes)](https://drive.google.com/file/d/1YTcfIfl99xYQE98aUyiQkZqrg95g1qlm/view?usp=drive_link)  | 48.0        | 
+| Model                                                                                                          | Test(%mIou) |
+|----------------------------------------------------------------------------------------------------------------|-------------|
+| [PIDNet-S(no pretrain)](https://drive.google.com/file/d/1tTZIoGU4H4d4iqJZ-llD-y_nPT65RsAR/view?usp=drive_link) | 38.2        | 
+| [SANet-S(no pretrain)](https://drive.google.com/file/d/1GVDvdvi0oPMCqDylpQTlwxtQ7iKPfcD8/view?usp=drive_link)  | 38.5        | 
+| [PIDNet-S(Cityscapes)](https://drive.google.com/file/d/1ImflNkZMoN9Jl8zlGzvNRdnl21BbANWU/view?usp=drive_link)  | 45.0        | 
+| [SANet-S(Cityscapes)](https://drive.google.com/file/d/1FQPemd5hvxJwsrl38cy0XW7iXqqPgj51/view?usp=drive_link)   | 48.0        | 
 
 ## Speed
 
