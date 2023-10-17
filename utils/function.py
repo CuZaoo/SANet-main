@@ -79,6 +79,16 @@ def validate(config, testloader, model, writer_dict):
     model.eval()
     ave_loss = AverageMeter()
     nums = config.MODEL.NUM_OUTPUTS
+
+    if config.DATASET.DATASET == 'cityscapes':
+        # tables = {"0": "道路", "1": "人行道", "2": "建筑物", "3": "墙", "4": "栅栏", "5": "柱子、杆子", "6": "交通灯",
+        #           "7": "交通标志", "8": "树木等垂直植被", "9": "草丛等水平植被"
+        #     , "10": "天空", "11": "人", "12": "骑手", "13": "汽车", "14": "卡车", "15": "公共汽车", "16": "火车",
+        #           "17": "摩托车", "18": "自行车"}
+        tables = ["道路", "人行道", "建筑物", "墙", "栅栏", "柱子_杆子", "交通灯", "交通标志", "树木等垂直植被",
+                  "草丛等水平植被", "天空", "人", "骑手", "汽车", "卡车", "公共汽车", "火车",
+                  "摩托车", "自行车"]
+
     confusion_matrix = np.zeros(
         (config.DATASET.NUM_CLASSES, config.DATASET.NUM_CLASSES, nums))
     with torch.no_grad():
@@ -111,7 +121,8 @@ def validate(config, testloader, model, writer_dict):
 
             loss = losses.mean()
             ave_loss.update(loss.item())
-
+    mean_IoU = []
+    IoU_array = []
     for i in range(nums):
         pos = confusion_matrix[..., i].sum(1)
         res = confusion_matrix[..., i].sum(0)
@@ -123,8 +134,15 @@ def validate(config, testloader, model, writer_dict):
 
     writer = writer_dict['writer']
     global_steps = writer_dict['valid_global_steps']
+
     writer.add_scalar('valid_loss', ave_loss.average(), global_steps)
-    writer.add_scalar('valid_mIoU', mean_IoU, global_steps)
+    writer.add_scalar('valid_mIoU_aux', mean_IoU[0], global_steps)
+    writer.add_scalar('valid_mIoU', mean_IoU[1], global_steps)
+    if config.DATASET.DATASET == 'cityscapes':
+        for i in range(len(IoU_array[0])):
+            writer.add_scalar(f'miou_aux_{str(tables[i])}', IoU_array[0][i], global_steps)
+            writer.add_scalar(f'miou_{str(tables[i])}', IoU_array[1][i], global_steps)
+
     writer_dict['valid_global_steps'] = global_steps + 1
     return ave_loss.average(), mean_IoU, IoU_array
 
