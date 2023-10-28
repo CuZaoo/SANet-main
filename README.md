@@ -55,7 +55,7 @@ TAPPM and in SANet's modeling code as TAPPM)
 <div align=center>
     <img src=figs/SAD.png width=70% />
 </div>
-Specific structure of Simple Attention Decoder[README_zh.md](README_zh.md)
+Specific structure of Simple Attention Decoder
 
 ## Use
 
