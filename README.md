@@ -40,7 +40,7 @@ feasible approach.
 The feasibility of APPPM is easy to understand. Say you have an image with 30x30 resolution, if you reduce the image by
 1/2 using normal pooling, the resolution is directly reduced to 15x15.
 If you use convolution to extract features after the pooling layer, it is clear that you can only extract features once
-at 15x15 resolution. With [README_zh.md](README_zh.md)an asymmetric pooling layer, the resolution is first reduced to
+at 15x15 resolution. With an asymmetric pooling layer, the resolution is first reduced to
 30x15, then to 15x15.
 If you still put the convolution behind the pooling layer to extract features, you can obviously extract more features
 at a more detailed resolution.
